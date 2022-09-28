@@ -1,10 +1,10 @@
-
-use diesel::*;
 use crate::models::BitImage;
 use crate::schema::*;
 use diesel::dsl::*;
 use diesel::expression::SqlLiteral;
+use diesel::pg::Pg;
 use diesel::prelude::{Queryable, Selectable};
+use diesel::*;
 use diesel::{sql_types, QueryDsl};
 #[derive(Queryable)]
 struct BitImageListItem {
@@ -47,7 +47,7 @@ where
                     .eq(bit_image::id)
                     .and(bil_c.field(bit_image_like::user_id).eq(1)),
             )
-            .into_boxed()//<<===== here is the err
+            //.into_boxed()//<<===== here is the err
             .single_value();
         (
             bit_image::all_columns,
@@ -61,4 +61,11 @@ where
             ),
         )
     }
+}
+
+fn what_into_boxed_type_after_join(user_id: Option<i32>) -> bit_image::BoxedQuery<'static, Pg> //what type here ?
+{
+    let a = bit_image::table.left_join(bit_image_like::table);
+    let b = a.into_boxed();
+    b
 }
